@@ -6,8 +6,8 @@ import (
 	"golang.org/x/exp/rand"
 
 	"github.com/jdbann/asteroids/component"
+	"github.com/jdbann/asteroids/resource"
 	"github.com/jdbann/asteroids/util/geo"
-	"github.com/mlange-42/arche-model/resource"
 	"github.com/mlange-42/arche/ecs"
 	"github.com/mlange-42/arche/generic"
 )
@@ -24,6 +24,7 @@ type AsteroidBuilder struct {
 }
 
 func NewAsteroidBuilder(w *ecs.World) *AsteroidBuilder {
+	screenSize := ecs.GetResource[resource.ScreenSize](w)
 	return &AsteroidBuilder{
 		builder: generic.NewMap3[component.Polygon, component.Position, component.Velocity](w),
 		rng:     rand.New(ecs.GetResource[resource.Rand](w)),
@@ -33,8 +34,8 @@ func NewAsteroidBuilder(w *ecs.World) *AsteroidBuilder {
 		sidesMin:    9,
 		sidesMax:    18,
 		roughness:   0.2,
-		positionMin: geo.Vec2{X: 0, Y: 0},
-		positionMax: geo.Vec2{X: 1280, Y: 720},
+		positionMin: screenSize.From,
+		positionMax: screenSize.To,
 		velocityMin: geo.Vec2{X: -2, Y: -2},
 		velocityMax: geo.Vec2{X: 2, Y: 2},
 	}

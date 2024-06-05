@@ -29,6 +29,10 @@ func (p Polygon) Translate(delta Vec2) Polygon {
 	return out
 }
 
+type Rectangle struct {
+	From, To Vec2
+}
+
 type Vec2 struct {
 	X, Y float32
 }
