@@ -50,9 +50,13 @@ func (s *Collision) Update(w *ecs.World) {
 					targetBody, targetPosition := targetQuery.Get()
 					targetPolygon := targetBody.Polygon.Rotate(targetPosition.Heading).Translate(targetPosition.Coords)
 
-					// If these polygons collide, remove the entities
+					// If these polygons collide, remove the appropriate entities
 					if memberPolygon.InPolygon(targetPolygon) {
-						toRemove = append(toRemove, memberQuery.Entity(), targetQuery.Entity())
+						toRemove = append(toRemove, targetQuery.Entity())
+
+						if collisionParams.DestroySelf {
+							toRemove = append(toRemove, memberQuery.Entity())
+						}
 					}
 				}
 			}

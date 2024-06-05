@@ -20,6 +20,7 @@ type CollisionGroup struct {
 
 type CollisionParams struct {
 	DestroyGroups []ecs.Entity
+	DestroySelf   bool
 }
 
 type Forces struct {

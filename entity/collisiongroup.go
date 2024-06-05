@@ -32,5 +32,6 @@ func (b *CollisionGroupBuilder) Build() {
 	})
 	b.RoundGroup = b.builder.NewWith(&component.CollisionParams{
 		DestroyGroups: []ecs.Entity{b.AsteroidGroup},
+		DestroySelf:   true,
 	})
 }
