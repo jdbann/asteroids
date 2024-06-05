@@ -10,7 +10,7 @@ import (
 )
 
 type Wrap struct {
-	filter *generic.Filter2[component.Polygon, component.Position]
+	filter *generic.Filter2[component.Body, component.Position]
 
 	screenSizeRes generic.Resource[resource.ScreenSize]
 }
@@ -19,7 +19,7 @@ func (s *Wrap) Finalize(w *ecs.World) {
 }
 
 func (s *Wrap) Initialize(w *ecs.World) {
-	s.filter = generic.NewFilter2[component.Polygon, component.Position]()
+	s.filter = generic.NewFilter2[component.Body, component.Position]()
 
 	s.screenSizeRes = generic.NewResource[resource.ScreenSize](w)
 }
@@ -30,8 +30,8 @@ func (s *Wrap) Update(w *ecs.World) {
 
 	query := s.filter.Query(w)
 	for query.Next() {
-		polygon, position := query.Get()
-		bb := geo.Polygon(*polygon).Translate(position.Coords).BoundingBox()
+		body, position := query.Get()
+		bb := body.Polygon.Translate(position.Coords).BoundingBox()
 
 		if bb.Overlaps(screenSize) {
 			continue

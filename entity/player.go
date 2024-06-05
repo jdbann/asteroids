@@ -12,7 +12,7 @@ import (
 )
 
 type PlayerBuilder struct {
-	builder generic.Map5[component.Cannon, component.Forces, component.Thrusters, component.Polygon, component.Position]
+	builder generic.Map5[component.Body, component.Cannon, component.Forces, component.Thrusters, component.Position]
 	rng     *rand.Rand
 
 	positionBounds geo.Rectangle
@@ -22,7 +22,7 @@ func NewPlayerBuilder(w *ecs.World) *PlayerBuilder {
 	screenSize := ecs.GetResource[resource.ScreenSize](w)
 
 	return &PlayerBuilder{
-		builder: generic.NewMap5[component.Cannon, component.Forces, component.Thrusters, component.Polygon, component.Position](w),
+		builder: generic.NewMap5[component.Body, component.Cannon, component.Forces, component.Thrusters, component.Position](w),
 		rng:     rand.New(ecs.GetResource[resource.Rand](w)),
 
 		positionBounds: geo.Rectangle(*screenSize),
@@ -31,6 +31,7 @@ func NewPlayerBuilder(w *ecs.World) *PlayerBuilder {
 
 func (b *PlayerBuilder) Build() {
 	b.builder.NewWith(
+		b.polygon(),
 		&component.Cannon{
 			Offset:   geo.V2(0, 6),
 			Velocity: 3,
@@ -42,17 +43,18 @@ func (b *PlayerBuilder) Build() {
 			Forward: .2,
 			Turn:    math.Pi * 3 / 180,
 		},
-		b.polygon(),
 		b.position(),
 	)
 }
 
-func (b *PlayerBuilder) polygon() *component.Polygon {
-	return &component.Polygon{
-		Vertices: []geo.Vec2{
-			{X: 0, Y: 10},
-			{X: 6, Y: -10},
-			{X: -6, Y: -10},
+func (b *PlayerBuilder) polygon() *component.Body {
+	return &component.Body{
+		Polygon: geo.Polygon{
+			Vertices: []geo.Vec2{
+				{X: 0, Y: 10},
+				{X: 6, Y: -10},
+				{X: -6, Y: -10},
+			},
 		},
 	}
 }

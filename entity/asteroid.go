@@ -13,7 +13,7 @@ import (
 )
 
 type AsteroidBuilder struct {
-	builder generic.Map3[component.Forces, component.Polygon, component.Position]
+	builder generic.Map3[component.Body, component.Forces, component.Position]
 	rng     *rand.Rand
 
 	radiusMin, radiusMax     float32
@@ -27,7 +27,7 @@ func NewAsteroidBuilder(w *ecs.World) *AsteroidBuilder {
 	screenSize := ecs.GetResource[resource.ScreenSize](w)
 
 	return &AsteroidBuilder{
-		builder: generic.NewMap3[component.Forces, component.Polygon, component.Position](w),
+		builder: generic.NewMap3[component.Body, component.Forces, component.Position](w),
 		rng:     rand.New(ecs.GetResource[resource.Rand](w)),
 
 		radiusMin:      50,
@@ -44,10 +44,30 @@ func NewAsteroidBuilder(w *ecs.World) *AsteroidBuilder {
 func (b *AsteroidBuilder) BuildBatch(count int) {
 	query := b.builder.NewBatchQ(count)
 	for query.Next() {
-		forces, polygon, position := query.Get()
+		body, forces, position := query.Get()
+		*body = *b.body()
 		*forces = *b.forces()
-		*polygon = *b.polygon()
 		*position = *b.position()
+	}
+}
+
+func (b *AsteroidBuilder) body() *component.Body {
+	radius := b.radiusMin + b.rng.Float32()*(b.radiusMax-b.radiusMin)
+	sides := b.sidesMin + b.rng.Int31n(b.sidesMax-b.sidesMin)
+	angle := math.Pi * 2 / float64(sides)
+
+	p := geo.Polygon{}
+	p.Vertices = make([]geo.Vec2, sides)
+	for i := range p.Vertices {
+		vRadius := radius * (1 + (b.roughness * 2 * b.rng.Float32()) - b.roughness)
+		p.Vertices[i] = geo.Vec2{
+			X: vRadius * float32(math.Sin(angle*float64(i))),
+			Y: vRadius * float32(math.Cos(angle*float64(i))),
+		}
+	}
+
+	return &component.Body{
+		Polygon: p,
 	}
 }
 
@@ -58,23 +78,6 @@ func (b *AsteroidBuilder) forces() *component.Forces {
 			Y: b.velocityMin.Y + b.rng.Float32()*(b.velocityMax.Y-b.velocityMin.Y),
 		},
 	}
-}
-
-func (b *AsteroidBuilder) polygon() *component.Polygon {
-	radius := b.radiusMin + b.rng.Float32()*(b.radiusMax-b.radiusMin)
-	sides := b.sidesMin + b.rng.Int31n(b.sidesMax-b.sidesMin)
-	angle := math.Pi * 2 / float64(sides)
-
-	p := component.Polygon{}
-	p.Vertices = make([]geo.Vec2, sides)
-	for i := range p.Vertices {
-		vRadius := radius * (1 + (b.roughness * 2 * b.rng.Float32()) - b.roughness)
-		p.Vertices[i] = geo.Vec2{
-			X: vRadius * float32(math.Sin(angle*float64(i))),
-			Y: vRadius * float32(math.Cos(angle*float64(i))),
-		}
-	}
-	return &p
 }
 
 func (b *AsteroidBuilder) position() *component.Position {
