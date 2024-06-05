@@ -13,7 +13,7 @@ import (
 )
 
 type AsteroidBuilder struct {
-	builder generic.Map3[component.Polygon, component.Position, component.Velocity]
+	builder generic.Map3[component.Forces, component.Polygon, component.Position]
 	rng     *rand.Rand
 
 	radiusMin, radiusMax     float32
@@ -27,7 +27,7 @@ func NewAsteroidBuilder(w *ecs.World) *AsteroidBuilder {
 	screenSize := ecs.GetResource[resource.ScreenSize](w)
 
 	return &AsteroidBuilder{
-		builder: generic.NewMap3[component.Polygon, component.Position, component.Velocity](w),
+		builder: generic.NewMap3[component.Forces, component.Polygon, component.Position](w),
 		rng:     rand.New(ecs.GetResource[resource.Rand](w)),
 
 		radiusMin:      50,
@@ -44,10 +44,19 @@ func NewAsteroidBuilder(w *ecs.World) *AsteroidBuilder {
 func (b *AsteroidBuilder) BuildBatch(count int) {
 	query := b.builder.NewBatchQ(count)
 	for query.Next() {
-		polygon, position, velocity := query.Get()
+		forces, polygon, position := query.Get()
+		*forces = *b.forces()
 		*polygon = *b.polygon()
 		*position = *b.position()
-		*velocity = *b.velocity()
+	}
+}
+
+func (b *AsteroidBuilder) forces() *component.Forces {
+	return &component.Forces{
+		Velocity: geo.Vec2{
+			X: b.velocityMin.X + b.rng.Float32()*(b.velocityMax.X-b.velocityMin.X),
+			Y: b.velocityMin.Y + b.rng.Float32()*(b.velocityMax.Y-b.velocityMin.Y),
+		},
 	}
 }
 
@@ -71,12 +80,5 @@ func (b *AsteroidBuilder) polygon() *component.Polygon {
 func (b *AsteroidBuilder) position() *component.Position {
 	return &component.Position{
 		Coords: positionInRectangle(b.rng, b.positionBounds),
-	}
-}
-
-func (b *AsteroidBuilder) velocity() *component.Velocity {
-	return &component.Velocity{
-		X: b.velocityMin.X + b.rng.Float32()*(b.velocityMax.X-b.velocityMin.X),
-		Y: b.velocityMin.Y + b.rng.Float32()*(b.velocityMax.Y-b.velocityMin.Y),
 	}
 }

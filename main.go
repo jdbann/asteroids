@@ -22,7 +22,6 @@ func main() {
 
 	m.AddSystem(&system.Movement{})
 	m.AddSystem(&system.Wrap{})
-	m.AddSystem(&system.Friction{})
 
 	ecs.AddResource(&m.World, &resource.ScreenSize{Max: geo.Vec2{X: 1280, Y: 720}})
 	ecs.AddResource(&m.World, resource.DefaultKeyBindings())

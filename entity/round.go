@@ -8,19 +8,22 @@ import (
 )
 
 type RoundBuilder struct {
-	builder generic.Map3[component.Polygon, component.Position, component.Velocity]
+	builder generic.Map3[component.Forces, component.Polygon, component.Position]
 
 	toAdd []roundComponents
 }
 
 func NewRoundBuilder(w *ecs.World) *RoundBuilder {
 	return &RoundBuilder{
-		builder: generic.NewMap3[component.Polygon, component.Position, component.Velocity](w),
+		builder: generic.NewMap3[component.Forces, component.Polygon, component.Position](w),
 	}
 }
 
 func (b *RoundBuilder) Add(position, velocity geo.Vec2) {
 	b.toAdd = append(b.toAdd, roundComponents{
+		&component.Forces{
+			Velocity: velocity,
+		},
 		&component.Polygon{
 			Vertices: []geo.Vec2{
 				{},
@@ -30,26 +33,22 @@ func (b *RoundBuilder) Add(position, velocity geo.Vec2) {
 		&component.Position{
 			Coords: position,
 		},
-		&component.Velocity{
-			X: velocity.X,
-			Y: velocity.Y,
-		},
 	})
 }
 
 func (b *RoundBuilder) Build() {
 	for _, c := range b.toAdd {
 		b.builder.NewWith(
+			c.forces,
 			c.polygon,
 			c.position,
-			c.velocity,
 		)
 	}
 	b.toAdd = b.toAdd[:0]
 }
 
 type roundComponents struct {
+	forces   *component.Forces
 	polygon  *component.Polygon
 	position *component.Position
-	velocity *component.Velocity
 }

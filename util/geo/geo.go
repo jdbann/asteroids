@@ -137,3 +137,10 @@ func (v Vec2) Rotate(rad float32) Vec2 {
 		Y: float32(math.Sin(float64(rad)))*v.X + float32(math.Cos(float64(rad)))*v.Y,
 	}
 }
+
+func (v Vec2) Scale(n float32) Vec2 {
+	return Vec2{
+		X: v.X * n,
+		Y: v.Y * n,
+	}
+}
