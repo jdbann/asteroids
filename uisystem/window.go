@@ -23,7 +23,7 @@ func (s *Window) InitializeUI(w *ecs.World) {
 
 	screenSize := s.screenSizeRes.Get()
 
-	rl.InitWindow(int32(screenSize.To.X), int32(screenSize.To.Y), "asteroids")
+	rl.InitWindow(int32(screenSize.Max.X), int32(screenSize.Max.Y), "asteroids")
 }
 
 func (s *Window) PostUpdateUI(w *ecs.World) {

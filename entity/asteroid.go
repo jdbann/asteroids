@@ -34,8 +34,8 @@ func NewAsteroidBuilder(w *ecs.World) *AsteroidBuilder {
 		sidesMin:    9,
 		sidesMax:    18,
 		roughness:   0.2,
-		positionMin: screenSize.From,
-		positionMax: screenSize.To,
+		positionMin: screenSize.Min,
+		positionMax: screenSize.Max,
 		velocityMin: geo.Vec2{X: -2, Y: -2},
 		velocityMax: geo.Vec2{X: 2, Y: 2},
 	}
