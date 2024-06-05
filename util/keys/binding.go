@@ -45,6 +45,7 @@ func (k Keys) Pressed() bool {
 type Key int32
 
 const (
+	KeySpace Key = rl.KeySpace
 	KeyRight Key = rl.KeyRight
 	KeyLeft  Key = rl.KeyLeft
 	KeyUp    Key = rl.KeyUp

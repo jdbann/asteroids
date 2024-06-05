@@ -110,10 +110,24 @@ type Vec2 struct {
 	X, Y float32
 }
 
+func V2(x, y float32) Vec2 {
+	return Vec2{
+		X: x,
+		Y: y,
+	}
+}
+
 func (v Vec2) Add(delta Vec2) Vec2 {
 	return Vec2{
 		X: v.X + delta.X,
 		Y: v.Y + delta.Y,
+	}
+}
+
+func (v Vec2) Invert() Vec2 {
+	return Vec2{
+		X: -v.X,
+		Y: -v.Y,
 	}
 }
 
