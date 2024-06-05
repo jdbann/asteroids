@@ -1,9 +1,9 @@
 package uisystem
 
 import (
-	"github.com/fzipp/geom"
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/jdbann/asteroids/component"
+	"github.com/jdbann/asteroids/util/geo"
 	"github.com/mlange-42/arche-model/model"
 	"github.com/mlange-42/arche/ecs"
 	"github.com/mlange-42/arche/generic"
@@ -33,20 +33,14 @@ func (s *Render) UpdateUI(w *ecs.World) {
 	for query.Next() {
 		polygon, position := query.Get()
 
-		drawPolygon(*polygon, geom.Vec2(*position))
+		drawPolygon(geo.Polygon(*polygon).Translate(geo.Vec2(*position)))
 	}
 }
 
-func drawPolygon(polygon []geom.Vec2, position geom.Vec2) {
-	var vB geom.Vec2
-	for i, vA := range polygon {
-		if i == 0 {
-			vB = (polygon)[len(polygon)-1]
-		}
-
-		rl.DrawLineV(rl.Vector2(vA.Add(position)), rl.Vector2(vB.Add(position)), rl.Black)
-
-		vB = vA
+func drawPolygon(polygon geo.Polygon) {
+	for i := 0; i < polygon.Edges(); i++ {
+		a, b := polygon.Edge(i)
+		rl.DrawLineV(rl.Vector2(a), rl.Vector2(b), rl.Black)
 	}
 }
 

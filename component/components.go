@@ -1,9 +1,11 @@
 package component
 
-import "github.com/fzipp/geom"
+import (
+	"github.com/jdbann/asteroids/util/geo"
+)
 
-type Polygon []geom.Vec2
+type Polygon geo.Polygon
 
-type Position geom.Vec2
+type Position geo.Vec2
 
-type Velocity geom.Vec2
+type Velocity geo.Vec2

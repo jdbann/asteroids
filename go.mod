@@ -3,7 +3,6 @@ module github.com/jdbann/asteroids
 go 1.21.6
 
 require (
-	github.com/fzipp/geom v1.0.0
 	github.com/gen2brain/raylib-go/raylib v0.0.0-20240524074310-a997a44fb95b
 	github.com/mlange-42/arche v0.13.0
 	github.com/mlange-42/arche-model v0.9.0

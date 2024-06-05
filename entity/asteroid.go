@@ -5,8 +5,8 @@ import (
 
 	"golang.org/x/exp/rand"
 
-	"github.com/fzipp/geom"
 	"github.com/jdbann/asteroids/component"
+	"github.com/jdbann/asteroids/util/geo"
 	"github.com/mlange-42/arche-model/resource"
 	"github.com/mlange-42/arche/ecs"
 	"github.com/mlange-42/arche/generic"
@@ -19,8 +19,8 @@ type AsteroidBuilder struct {
 	radiusMin, radiusMax     float32
 	roughness                float32
 	sidesMin, sidesMax       int32
-	positionMin, positionMax geom.Vec2
-	velocityMin, velocityMax geom.Vec2
+	positionMin, positionMax geo.Vec2
+	velocityMin, velocityMax geo.Vec2
 }
 
 func NewAsteroidBuilder(w *ecs.World) *AsteroidBuilder {
@@ -33,10 +33,10 @@ func NewAsteroidBuilder(w *ecs.World) *AsteroidBuilder {
 		sidesMin:    9,
 		sidesMax:    18,
 		roughness:   0.2,
-		positionMin: geom.Vec2{X: 0, Y: 0},
-		positionMax: geom.Vec2{X: 1280, Y: 720},
-		velocityMin: geom.Vec2{X: -2, Y: -2},
-		velocityMax: geom.Vec2{X: 2, Y: 2},
+		positionMin: geo.Vec2{X: 0, Y: 0},
+		positionMax: geo.Vec2{X: 1280, Y: 720},
+		velocityMin: geo.Vec2{X: -2, Y: -2},
+		velocityMax: geo.Vec2{X: 2, Y: 2},
 	}
 }
 
@@ -55,10 +55,11 @@ func (b *AsteroidBuilder) polygon() *component.Polygon {
 	sides := b.sidesMin + b.rng.Int31n(b.sidesMax-b.sidesMin)
 	angle := math.Pi * 2 / float64(sides)
 
-	p := make(component.Polygon, sides)
-	for i := range p {
+	p := component.Polygon{}
+	p.Vertices = make([]geo.Vec2, sides)
+	for i := range p.Vertices {
 		vRadius := radius * (1 + (b.roughness * 2 * b.rng.Float32()) - b.roughness)
-		p[i] = geom.Vec2{
+		p.Vertices[i] = geo.Vec2{
 			X: vRadius * float32(math.Sin(angle*float64(i))),
 			Y: vRadius * float32(math.Cos(angle*float64(i))),
 		}
