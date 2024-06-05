@@ -8,14 +8,18 @@ import (
 )
 
 type RoundBuilder struct {
-	builder generic.Map3[component.Body, component.Forces, component.Position]
+	builder generic.Map4[component.Body, component.CollisionGroup, component.Forces, component.Position]
+
+	collisionGroup ecs.Entity
 
 	toAdd []roundComponents
 }
 
-func NewRoundBuilder(w *ecs.World) *RoundBuilder {
+func NewRoundBuilder(w *ecs.World, collisionGroup ecs.Entity) *RoundBuilder {
 	return &RoundBuilder{
-		builder: generic.NewMap3[component.Body, component.Forces, component.Position](w),
+		builder: generic.NewMap4[component.Body, component.CollisionGroup, component.Forces, component.Position](w, generic.T[component.CollisionGroup]()),
+
+		collisionGroup: collisionGroup,
 	}
 }
 
@@ -39,12 +43,17 @@ func (b *RoundBuilder) Add(position, velocity geo.Vec2) {
 }
 
 func (b *RoundBuilder) Build() {
-	for _, c := range b.toAdd {
-		b.builder.NewWith(
-			c.body,
-			c.forces,
-			c.position,
-		)
+	if len(b.toAdd) == 0 {
+		return
+	}
+	query := b.builder.NewBatchQ(len(b.toAdd), b.collisionGroup)
+	var i int
+	for query.Next() {
+		body, _, forces, position := query.Get()
+		*body = *b.toAdd[i].body
+		*forces = *b.toAdd[i].forces
+		*position = *b.toAdd[i].position
+		i++
 	}
 	b.toAdd = b.toAdd[:0]
 }

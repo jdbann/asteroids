@@ -66,3 +66,52 @@ func TestRectangle_WrapVec2(t *testing.T) {
 		})
 	}
 }
+
+func TestVec2_InPolygon(t *testing.T) {
+	type testCase struct {
+		name    string
+		vec2    geo.Vec2
+		polygon geo.Polygon
+		want    bool
+	}
+
+	run := func(t *testing.T, tc testCase) {
+		got := tc.vec2.InPolygon(tc.polygon)
+		assert.Equal(t, got, tc.want)
+	}
+
+	testCases := []testCase{
+		{
+			name: "outside square",
+			vec2: geo.Vec2{X: 15, Y: 5},
+			polygon: geo.Polygon{
+				Vertices: []geo.Vec2{
+					{0, 0},
+					{0, 10},
+					{10, 10},
+					{10, 0},
+				},
+			},
+			want: false,
+		},
+		{
+			name: "inside square",
+			vec2: geo.Vec2{X: 5, Y: 5},
+			polygon: geo.Polygon{
+				Vertices: []geo.Vec2{
+					{0, 0},
+					{0, 10},
+					{10, 10},
+					{10, 0},
+				},
+			},
+			want: true,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			run(t, tc)
+		})
+	}
+}

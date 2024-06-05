@@ -54,6 +54,22 @@ func (p Polygon) Rotate(rad float32) Polygon {
 	return out
 }
 
+func (p Polygon) InPolygon(q Polygon) bool {
+	for _, v := range p.Vertices {
+		if v.InPolygon(q) {
+			return true
+		}
+	}
+
+	for _, v := range q.Vertices {
+		if v.InPolygon(p) {
+			return true
+		}
+	}
+
+	return false
+}
+
 func (p Polygon) Translate(delta Vec2) Polygon {
 	out := Polygon{
 		Vertices: make([]Vec2, p.Edges()),
@@ -122,6 +138,33 @@ func (v Vec2) Add(delta Vec2) Vec2 {
 		X: v.X + delta.X,
 		Y: v.Y + delta.Y,
 	}
+}
+
+func (v Vec2) Dot(w Vec2) float32 {
+	return v.X*w.X + v.Y*w.Y
+}
+
+func (v Vec2) InPolygon(p Polygon) bool {
+	a := p.Vertices[p.Edges()-1]
+	for i := 1; i < p.Edges(); i++ {
+		b, c := p.Edge(i)
+		if v.InTriangle(a, b, c) {
+			return true
+		}
+	}
+	return false
+}
+
+func (v Vec2) InTriangle(a, b, c Vec2) bool {
+	s := (a.X-c.X)*(v.Y-c.Y) - (a.Y-c.Y)*(v.X-c.X)
+	t := (b.X-a.X)*(v.Y-a.Y) - (b.Y-a.Y)*(v.X-a.X)
+
+	if (s < 0) != (t < 0) && s != 0 && t != 0 {
+		return false
+	}
+
+	d := (c.X-b.X)*(v.Y-b.Y) - (c.Y-b.Y)*(v.X-b.X)
+	return d == 0 || (d < 0) == (s+t <= 0)
 }
 
 func (v Vec2) Invert() Vec2 {

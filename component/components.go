@@ -2,6 +2,7 @@ package component
 
 import (
 	"github.com/jdbann/asteroids/util/geo"
+	"github.com/mlange-42/arche/ecs"
 )
 
 type Body struct {
@@ -11,6 +12,14 @@ type Body struct {
 type Cannon struct {
 	Offset   geo.Vec2
 	Velocity float32
+}
+
+type CollisionGroup struct {
+	ecs.Relation
+}
+
+type CollisionParams struct {
+	DestroyGroups []ecs.Entity
 }
 
 type Forces struct {

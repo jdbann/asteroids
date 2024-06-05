@@ -13,9 +13,8 @@ import (
 type PlayerControls struct {
 	filter *generic.Filter4[component.Cannon, component.Forces, component.Position, component.Thrusters]
 
-	keyBindingsRes generic.Resource[resource.KeyBindings]
-
-	roundBuilder *entity.RoundBuilder
+	keyBindingsRes  generic.Resource[resource.KeyBindings]
+	roundBuilderRes generic.Resource[entity.RoundBuilder]
 }
 
 func (s *PlayerControls) FinalizeUI(w *ecs.World) {
@@ -25,12 +24,11 @@ func (s *PlayerControls) InitializeUI(w *ecs.World) {
 	s.filter = generic.NewFilter4[component.Cannon, component.Forces, component.Position, component.Thrusters]()
 
 	s.keyBindingsRes = generic.NewResource[resource.KeyBindings](w)
-
-	s.roundBuilder = entity.NewRoundBuilder(w)
+	s.roundBuilderRes = generic.NewResource[entity.RoundBuilder](w)
 }
 
 func (s *PlayerControls) PostUpdateUI(w *ecs.World) {
-	s.roundBuilder.Build()
+	s.roundBuilderRes.Get().Build()
 }
 
 func (s *PlayerControls) UpdateUI(w *ecs.World) {
@@ -41,7 +39,7 @@ func (s *PlayerControls) UpdateUI(w *ecs.World) {
 		cannon, forces, position, thrusters := query.Get()
 
 		if keyBindings.FireCannon.IsPressed() {
-			s.roundBuilder.Add(
+			s.roundBuilderRes.Get().Add(
 				position.Coords.Add(cannon.Offset.Rotate(position.Heading)),
 				geo.V2(0, cannon.Velocity).Rotate(position.Heading),
 			)

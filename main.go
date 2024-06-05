@@ -22,12 +22,18 @@ func main() {
 
 	m.AddSystem(&system.Movement{})
 	m.AddSystem(&system.Wrap{})
+	m.AddSystem(&system.Collision{})
 
 	ecs.AddResource(&m.World, &resource.ScreenSize{Max: geo.Vec2{X: 1280, Y: 720}})
 	ecs.AddResource(&m.World, resource.DefaultKeyBindings())
 
-	entity.NewAsteroidBuilder(&m.World).BuildBatch(10)
-	entity.NewPlayerBuilder(&m.World).Build()
+	cgb := entity.NewCollisionGroupBuilder(&m.World)
+	cgb.Build()
+
+	entity.NewAsteroidBuilder(&m.World, cgb.AsteroidGroup).BuildBatch(10)
+	entity.NewPlayerBuilder(&m.World, cgb.PlayerGroup).Build()
+
+	ecs.AddResource(&m.World, entity.NewRoundBuilder(&m.World, cgb.RoundGroup))
 
 	m.Run()
 }
