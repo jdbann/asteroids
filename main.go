@@ -24,7 +24,8 @@ func main() {
 
 	ecs.AddResource(&m.World, &resource.ScreenSize{Max: geo.Vec2{X: 1280, Y: 720}})
 
-	entity.NewAsteroidBuilder(&m.World).Build(10)
+	entity.NewAsteroidBuilder(&m.World).BuildBatch(10)
+	entity.NewPlayerBuilder(&m.World).Build()
 
 	m.Run()
 }
