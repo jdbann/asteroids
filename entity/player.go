@@ -10,7 +10,7 @@ import (
 )
 
 type PlayerBuilder struct {
-	builder generic.Map4[component.PlayerControlled, component.Polygon, component.Position, component.Velocity]
+	builder generic.Map5[component.Friction, component.PlayerControlled, component.Polygon, component.Position, component.Velocity]
 	rng     *rand.Rand
 
 	positionBounds geo.Rectangle
@@ -20,7 +20,7 @@ func NewPlayerBuilder(w *ecs.World) *PlayerBuilder {
 	screenSize := ecs.GetResource[resource.ScreenSize](w)
 
 	return &PlayerBuilder{
-		builder: generic.NewMap4[component.PlayerControlled, component.Polygon, component.Position, component.Velocity](w),
+		builder: generic.NewMap5[component.Friction, component.PlayerControlled, component.Polygon, component.Position, component.Velocity](w),
 		rng:     rand.New(ecs.GetResource[resource.Rand](w)),
 
 		positionBounds: geo.Rectangle(*screenSize),
@@ -28,7 +28,9 @@ func NewPlayerBuilder(w *ecs.World) *PlayerBuilder {
 }
 
 func (b *PlayerBuilder) Build() {
+	friction := component.Friction(.01)
 	b.builder.NewWith(
+		&friction,
 		&component.PlayerControlled{},
 		b.polygon(),
 		b.position(),

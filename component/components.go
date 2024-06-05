@@ -4,6 +4,8 @@ import (
 	"github.com/jdbann/asteroids/util/geo"
 )
 
+type Friction float32
+
 type PlayerControlled struct{}
 
 type Polygon geo.Polygon

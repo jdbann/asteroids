@@ -35,7 +35,7 @@ func (s *PlayerControls) UpdateUI(w *ecs.World) {
 		velocity := query.Get()
 
 		if keyBindings.FireThrusters.IsDown() {
-			velocity.Y += 1
+			velocity.Y += .2
 		}
 	}
 }
