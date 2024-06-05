@@ -2,6 +2,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/ebitengine/purego v0.7.1 h1:6/55d26lG3o9VCZX8lping+bZcmShseiqlh2bnUDiPA=
 github.com/ebitengine/purego v0.7.1/go.mod h1:ah1In8AOtksoNK6yk5z1HTJeUkC1Ez4Wk2idgGslMwQ=
+github.com/fzipp/geom v1.0.0 h1:QhTKV8gNOBdyCNE8hlv4UKmUNYtxzds/Z392LwH4uQw=
+github.com/fzipp/geom v1.0.0/go.mod h1:gdaEjeI2z7tzxsrDwK86/4qZF3dbkoEhuGY+NCJLV6M=
 github.com/gen2brain/raylib-go/raylib v0.0.0-20240524074310-a997a44fb95b h1:BOAQWmspPqfnNWsPVD2x5BSXR9LGZhdN3litGjVcWIc=
 github.com/gen2brain/raylib-go/raylib v0.0.0-20240524074310-a997a44fb95b/go.mod h1:BaY76bZk7nw1/kVOSQObPY1v1iwVE1KHAGMfvI6oK1Q=
 github.com/mlange-42/arche v0.13.0 h1:ef0fu9qC2KIr8wIlVs+CgeQ5CSUJ8A1Hut6nXYdf+xk=
