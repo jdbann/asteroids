@@ -69,7 +69,9 @@ func (b *AsteroidBuilder) polygon() *component.Polygon {
 }
 
 func (b *AsteroidBuilder) position() *component.Position {
-	return positionInRectangle(b.rng, b.positionBounds)
+	return &component.Position{
+		Coords: positionInRectangle(b.rng, b.positionBounds),
+	}
 }
 
 func (b *AsteroidBuilder) velocity() *component.Velocity {

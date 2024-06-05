@@ -28,8 +28,7 @@ func (b *RoundBuilder) Add(position, velocity geo.Vec2) {
 			},
 		},
 		&component.Position{
-			X: position.X,
-			Y: position.Y,
+			Coords: position,
 		},
 		&component.Velocity{
 			X: velocity.X,

@@ -9,13 +9,14 @@ type Cannon struct {
 	Velocity float32
 }
 
-type Heading float32
-
 type Friction float32
 
 type Polygon geo.Polygon
 
-type Position geo.Vec2
+type Position struct {
+	Coords  geo.Vec2
+	Heading float32
+}
 
 type Thrusters struct {
 	Forward float32

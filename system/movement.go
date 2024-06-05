@@ -2,6 +2,7 @@ package system
 
 import (
 	"github.com/jdbann/asteroids/component"
+	"github.com/jdbann/asteroids/util/geo"
 	"github.com/mlange-42/arche-model/model"
 	"github.com/mlange-42/arche/ecs"
 	"github.com/mlange-42/arche/generic"
@@ -22,8 +23,7 @@ func (s *Movement) Update(w *ecs.World) {
 	query := s.filter.Query(w)
 	for query.Next() {
 		position, velocity := query.Get()
-		position.X = position.X + velocity.X
-		position.Y = position.Y + velocity.Y
+		position.Coords = position.Coords.Add(geo.Vec2(*velocity))
 	}
 }
 

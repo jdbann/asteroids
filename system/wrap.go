@@ -31,16 +31,15 @@ func (s *Wrap) Update(w *ecs.World) {
 	query := s.filter.Query(w)
 	for query.Next() {
 		polygon, position := query.Get()
-		bb := geo.Polygon(*polygon).Translate(geo.Vec2(*position)).BoundingBox()
+		bb := geo.Polygon(*polygon).Translate(position.Coords).BoundingBox()
 
 		if bb.Overlaps(screenSize) {
 			continue
 		}
 
-		wrapPosition := screenSize.Inset(-bb.Dx()/2, -bb.Dy()/2).WrapVec2(geo.Vec2(*position))
+		wrapCoords := screenSize.Inset(-bb.Dx()/2, -bb.Dy()/2).WrapVec2(position.Coords)
 
-		position.X = wrapPosition.X
-		position.Y = wrapPosition.Y
+		position.Coords = wrapCoords
 	}
 }
 

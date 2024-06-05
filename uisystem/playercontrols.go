@@ -11,7 +11,7 @@ import (
 )
 
 type PlayerControls struct {
-	filter *generic.Filter5[component.Cannon, component.Heading, component.Position, component.Thrusters, component.Velocity]
+	filter *generic.Filter4[component.Cannon, component.Position, component.Thrusters, component.Velocity]
 
 	keyBindingsRes generic.Resource[resource.KeyBindings]
 
@@ -22,7 +22,7 @@ func (s *PlayerControls) FinalizeUI(w *ecs.World) {
 }
 
 func (s *PlayerControls) InitializeUI(w *ecs.World) {
-	s.filter = generic.NewFilter5[component.Cannon, component.Heading, component.Position, component.Thrusters, component.Velocity]()
+	s.filter = generic.NewFilter4[component.Cannon, component.Position, component.Thrusters, component.Velocity]()
 
 	s.keyBindingsRes = generic.NewResource[resource.KeyBindings](w)
 
@@ -38,26 +38,26 @@ func (s *PlayerControls) UpdateUI(w *ecs.World) {
 
 	query := s.filter.Query(w)
 	for query.Next() {
-		cannon, heading, position, thrusters, velocity := query.Get()
+		cannon, position, thrusters, velocity := query.Get()
 
 		if keyBindings.FireCannon.IsPressed() {
 			s.roundBuilder.Add(
-				geo.Vec2(*position).Add(cannon.Offset.Rotate(float32(*heading))),
-				geo.V2(0, cannon.Velocity).Rotate(float32(*heading)),
+				position.Coords.Add(cannon.Offset.Rotate(position.Heading)),
+				geo.V2(0, cannon.Velocity).Rotate(position.Heading),
 			)
 		}
 
 		if keyBindings.TurnCCW.IsDown() {
-			*heading -= component.Heading(thrusters.Turn)
+			position.Heading -= thrusters.Turn
 		}
 
 		if keyBindings.TurnCW.IsDown() {
-			*heading += component.Heading(thrusters.Turn)
+			position.Heading += thrusters.Turn
 		}
 
 		if keyBindings.FireThrusters.IsDown() {
 			thrust := geo.Vec2{Y: thrusters.Forward}
-			thrust = thrust.Rotate(float32(*heading))
+			thrust = thrust.Rotate(position.Heading)
 			newVelocity := geo.Vec2(*velocity).Add(thrust)
 			velocity.X = newVelocity.X
 			velocity.Y = newVelocity.Y
