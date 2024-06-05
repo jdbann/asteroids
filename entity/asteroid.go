@@ -35,8 +35,8 @@ func NewAsteroidBuilder(w *ecs.World) *AsteroidBuilder {
 		roughness:   0.2,
 		positionMin: geom.Vec2{X: 0, Y: 0},
 		positionMax: geom.Vec2{X: 1280, Y: 720},
-		velocityMin: geom.Vec2{},
-		velocityMax: geom.Vec2{},
+		velocityMin: geom.Vec2{X: -2, Y: -2},
+		velocityMax: geom.Vec2{X: 2, Y: 2},
 	}
 }
 
