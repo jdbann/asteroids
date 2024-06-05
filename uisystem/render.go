@@ -10,14 +10,15 @@ import (
 )
 
 type Render struct {
-	filter *generic.Filter2[component.Polygon, component.Position]
+	filter *generic.Filter3[component.Heading, component.Polygon, component.Position]
 }
 
 func (s *Render) FinalizeUI(w *ecs.World) {
 }
 
 func (s *Render) InitializeUI(w *ecs.World) {
-	s.filter = generic.NewFilter2[component.Polygon, component.Position]()
+	s.filter = generic.NewFilter3[component.Heading, component.Polygon, component.Position]().
+		Optional(generic.T[component.Heading]())
 }
 
 func (s *Render) PostUpdateUI(w *ecs.World) {
@@ -31,9 +32,14 @@ func (s *Render) UpdateUI(w *ecs.World) {
 
 	query := s.filter.Query(w)
 	for query.Next() {
-		polygon, position := query.Get()
+		heading, polygon, position := query.Get()
 
-		drawPolygon(geo.Polygon(*polygon).Translate(geo.Vec2(*position)))
+		p := geo.Polygon(*polygon)
+		if heading != nil {
+			p = p.Rotate(float32(*heading))
+		}
+		p = p.Translate(geo.Vec2(*position))
+		drawPolygon(p)
 	}
 }
 

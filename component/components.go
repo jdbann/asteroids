@@ -4,12 +4,17 @@ import (
 	"github.com/jdbann/asteroids/util/geo"
 )
 
-type Friction float32
+type Heading float32
 
-type PlayerControlled struct{}
+type Friction float32
 
 type Polygon geo.Polygon
 
 type Position geo.Vec2
+
+type Thrusters struct {
+	Forward float32
+	Turn    float32
+}
 
 type Velocity geo.Vec2

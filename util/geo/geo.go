@@ -42,6 +42,18 @@ func (p Polygon) Edges() int {
 	return len(p.Vertices)
 }
 
+func (p Polygon) Rotate(rad float32) Polygon {
+	out := Polygon{
+		Vertices: make([]Vec2, p.Edges()),
+	}
+
+	for i, v := range p.Vertices {
+		out.Vertices[i] = v.Rotate(rad)
+	}
+
+	return out
+}
+
 func (p Polygon) Translate(delta Vec2) Polygon {
 	out := Polygon{
 		Vertices: make([]Vec2, p.Edges()),
@@ -102,5 +114,12 @@ func (v Vec2) Add(delta Vec2) Vec2 {
 	return Vec2{
 		X: v.X + delta.X,
 		Y: v.Y + delta.Y,
+	}
+}
+
+func (v Vec2) Rotate(rad float32) Vec2 {
+	return Vec2{
+		X: float32(math.Cos(float64(rad)))*v.X - float32(math.Sin(float64(rad)))*v.Y,
+		Y: float32(math.Sin(float64(rad)))*v.X + float32(math.Cos(float64(rad)))*v.Y,
 	}
 }

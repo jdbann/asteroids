@@ -1,6 +1,8 @@
 package entity
 
 import (
+	"math"
+
 	"github.com/jdbann/asteroids/component"
 	"github.com/jdbann/asteroids/resource"
 	"github.com/jdbann/asteroids/util/geo"
@@ -10,7 +12,7 @@ import (
 )
 
 type PlayerBuilder struct {
-	builder generic.Map5[component.Friction, component.PlayerControlled, component.Polygon, component.Position, component.Velocity]
+	builder generic.Map6[component.Heading, component.Friction, component.Thrusters, component.Polygon, component.Position, component.Velocity]
 	rng     *rand.Rand
 
 	positionBounds geo.Rectangle
@@ -20,7 +22,7 @@ func NewPlayerBuilder(w *ecs.World) *PlayerBuilder {
 	screenSize := ecs.GetResource[resource.ScreenSize](w)
 
 	return &PlayerBuilder{
-		builder: generic.NewMap5[component.Friction, component.PlayerControlled, component.Polygon, component.Position, component.Velocity](w),
+		builder: generic.NewMap6[component.Heading, component.Friction, component.Thrusters, component.Polygon, component.Position, component.Velocity](w),
 		rng:     rand.New(ecs.GetResource[resource.Rand](w)),
 
 		positionBounds: geo.Rectangle(*screenSize),
@@ -28,10 +30,15 @@ func NewPlayerBuilder(w *ecs.World) *PlayerBuilder {
 }
 
 func (b *PlayerBuilder) Build() {
+	heading := component.Heading(b.rng.Float32() * math.Pi * 2)
 	friction := component.Friction(.01)
 	b.builder.NewWith(
+		&heading,
 		&friction,
-		&component.PlayerControlled{},
+		&component.Thrusters{
+			Forward: .2,
+			Turn:    math.Pi * 3 / 180,
+		},
 		b.polygon(),
 		b.position(),
 		&component.Velocity{},
