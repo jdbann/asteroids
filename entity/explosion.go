@@ -12,19 +12,21 @@ import (
 )
 
 type ExplosionBuilder struct {
-	builder generic.Map3[component.Body, component.Forces, component.Position]
-	rng     *rand.Rand
+	sourceMapper generic.Map3[component.Body, component.Forces, component.Position]
+	builder      generic.Map4[component.Body, component.Disappear, component.Forces, component.Position]
+	rng          *rand.Rand
 }
 
 func NewExplosionBuilder(w *ecs.World) *ExplosionBuilder {
 	return &ExplosionBuilder{
-		builder: generic.NewMap3[component.Body, component.Forces, component.Position](w),
-		rng:     rand.New(ecs.GetResource[resource.Rand](w)),
+		sourceMapper: generic.NewMap3[component.Body, component.Forces, component.Position](w),
+		builder:      generic.NewMap4[component.Body, component.Disappear, component.Forces, component.Position](w),
+		rng:          rand.New(ecs.GetResource[resource.Rand](w)),
 	}
 }
 
 func (b *ExplosionBuilder) BuildFrom(entity ecs.Entity) {
-	sourceBody, sourceForces, sourcePosition := b.builder.Get(entity)
+	sourceBody, sourceForces, sourcePosition := b.sourceMapper.Get(entity)
 
 	if sourceBody == nil || sourceForces == nil || sourcePosition == nil {
 		panic("attempted to exploded an unexplodable entity")
@@ -35,7 +37,7 @@ func (b *ExplosionBuilder) BuildFrom(entity ecs.Entity) {
 	var i int
 	query := b.builder.NewBatchQ(sourcePolygon.Edges())
 	for query.Next() {
-		body, forces, position := query.Get()
+		body, disappear, forces, position := query.Get()
 
 		start, end := sourcePolygon.Edge(i)
 		mid := start.Add(end).Scale(0.5)
@@ -43,6 +45,8 @@ func (b *ExplosionBuilder) BuildFrom(entity ecs.Entity) {
 		body.Polygon = geo.Polygon{
 			Vertices: []geo.Vec2{start.Sub(mid), end.Sub(mid)},
 		}
+
+		disappear.Rate = 0.01
 
 		forces.Rotation = (b.rng.Float32() - 0.5) * math.Pi * 2 / 180
 		forces.Velocity = sourceForces.Velocity.Add(

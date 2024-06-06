@@ -13,6 +13,11 @@ type Cannon struct {
 	Velocity float32
 }
 
+type Disappear struct {
+	Progress float32
+	Rate     float32
+}
+
 type Forces struct {
 	Rotation float32
 	Friction float32

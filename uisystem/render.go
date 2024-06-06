@@ -10,14 +10,15 @@ import (
 )
 
 type Render struct {
-	filter *generic.Filter2[component.Body, component.Position]
+	filter *generic.Filter3[component.Body, component.Disappear, component.Position]
 }
 
 func (s *Render) FinalizeUI(w *ecs.World) {
 }
 
 func (s *Render) InitializeUI(w *ecs.World) {
-	s.filter = generic.NewFilter2[component.Body, component.Position]()
+	s.filter = generic.NewFilter3[component.Body, component.Disappear, component.Position]().
+		Optional(generic.T[component.Disappear]())
 }
 
 func (s *Render) PostUpdateUI(w *ecs.World) {
@@ -31,19 +32,28 @@ func (s *Render) UpdateUI(w *ecs.World) {
 
 	query := s.filter.Query(w)
 	for query.Next() {
-		body, position := query.Get()
+		body, disappear, position := query.Get()
+
+		color := rl.Black
+
+		if disappear != nil {
+			color = rl.ColorAlpha(color, 1-disappear.Progress)
+			disappear.Progress += disappear.Rate
+		}
+
 		drawPolygon(
 			body.Polygon.
 				Rotate(position.Heading).
 				Translate(position.Coords),
+			color,
 		)
 	}
 }
 
-func drawPolygon(polygon geo.Polygon) {
+func drawPolygon(polygon geo.Polygon, color rl.Color) {
 	for i := 0; i < polygon.Edges(); i++ {
 		a, b := polygon.Edge(i)
-		rl.DrawLineV(rl.Vector2(a), rl.Vector2(b), rl.Black)
+		rl.DrawLineV(rl.Vector2(a), rl.Vector2(b), color)
 	}
 }
 
