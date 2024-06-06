@@ -25,13 +25,21 @@ func NewCollisionGroupBuilder(w *ecs.World) *CollisionGroupBuilder {
 
 func (b *CollisionGroupBuilder) Build() {
 	b.PlayerGroup = b.builder.NewWith(&component.CollisionParams{
-		DestroyGroups: nil,
+		Interactions: map[ecs.Entity]component.CollisionActions{},
 	})
 	b.AsteroidGroup = b.builder.NewWith(&component.CollisionParams{
-		DestroyGroups: []ecs.Entity{b.PlayerGroup},
+		Interactions: map[ecs.Entity]component.CollisionActions{
+			b.PlayerGroup: {
+				Other: component.CollisionActionExplode,
+			},
+		},
 	})
 	b.RoundGroup = b.builder.NewWith(&component.CollisionParams{
-		DestroyGroups: []ecs.Entity{b.AsteroidGroup},
-		DestroySelf:   true,
+		Interactions: map[ecs.Entity]component.CollisionActions{
+			b.AsteroidGroup: {
+				Self:  component.CollisionActionRemove,
+				Other: component.CollisionActionExplode,
+			},
+		},
 	})
 }

@@ -174,6 +174,11 @@ func (v Vec2) Invert() Vec2 {
 	}
 }
 
+func (v Vec2) Normalize() Vec2 {
+	len := float32(math.Sqrt(float64(v.X*v.X + v.Y*v.Y)))
+	return v.Scale(1 / len)
+}
+
 func (v Vec2) Rotate(rad float32) Vec2 {
 	return Vec2{
 		X: float32(math.Cos(float64(rad)))*v.X - float32(math.Sin(float64(rad)))*v.Y,
@@ -185,5 +190,12 @@ func (v Vec2) Scale(n float32) Vec2 {
 	return Vec2{
 		X: v.X * n,
 		Y: v.Y * n,
+	}
+}
+
+func (v Vec2) Sub(delta Vec2) Vec2 {
+	return Vec2{
+		X: v.X - delta.X,
+		Y: v.Y - delta.Y,
 	}
 }

@@ -34,6 +34,7 @@ func main() {
 	entity.NewPlayerBuilder(&m.World, cgb.PlayerGroup).Build()
 
 	ecs.AddResource(&m.World, entity.NewRoundBuilder(&m.World, cgb.RoundGroup))
+	ecs.AddResource(&m.World, entity.NewExplosionBuilder(&m.World))
 
 	m.Run()
 }
