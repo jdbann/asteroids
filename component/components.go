@@ -28,3 +28,5 @@ type Thrusters struct {
 	Forward float32
 	Turn    float32
 }
+
+type Wrap struct{}

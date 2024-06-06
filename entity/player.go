@@ -12,7 +12,7 @@ import (
 )
 
 type PlayerBuilder struct {
-	builder generic.Map6[component.Body, component.Cannon, component.CollisionGroup, component.Forces, component.Thrusters, component.Position]
+	builder generic.Map7[component.Body, component.Cannon, component.CollisionGroup, component.Forces, component.Thrusters, component.Position, component.Wrap]
 	rng     *rand.Rand
 
 	collisionGroup ecs.Entity
@@ -23,7 +23,7 @@ func NewPlayerBuilder(w *ecs.World, collisionGroup ecs.Entity) *PlayerBuilder {
 	screenSize := ecs.GetResource[resource.ScreenSize](w)
 
 	return &PlayerBuilder{
-		builder: generic.NewMap6[component.Body, component.Cannon, component.CollisionGroup, component.Forces, component.Thrusters, component.Position](w, generic.T[component.CollisionGroup]()),
+		builder: generic.NewMap7[component.Body, component.Cannon, component.CollisionGroup, component.Forces, component.Thrusters, component.Position, component.Wrap](w, generic.T[component.CollisionGroup]()),
 		rng:     rand.New(ecs.GetResource[resource.Rand](w)),
 
 		collisionGroup: collisionGroup,
@@ -34,7 +34,7 @@ func NewPlayerBuilder(w *ecs.World, collisionGroup ecs.Entity) *PlayerBuilder {
 func (b *PlayerBuilder) Build() {
 	query := b.builder.NewBatchQ(1, b.collisionGroup)
 	for query.Next() {
-		body, cannon, _, forces, thrusters, position := query.Get()
+		body, cannon, _, forces, thrusters, position, _ := query.Get()
 		*body = *b.polygon()
 		*cannon = component.Cannon{
 			Offset:   geo.V2(0, 6),

@@ -13,7 +13,7 @@ import (
 )
 
 type AsteroidBuilder struct {
-	builder generic.Map4[component.Body, component.CollisionGroup, component.Forces, component.Position]
+	builder generic.Map5[component.Body, component.CollisionGroup, component.Forces, component.Position, component.Wrap]
 	rng     *rand.Rand
 
 	collisionGroup           ecs.Entity
@@ -28,7 +28,7 @@ func NewAsteroidBuilder(w *ecs.World, collisionGroup ecs.Entity) *AsteroidBuilde
 	screenSize := ecs.GetResource[resource.ScreenSize](w)
 
 	return &AsteroidBuilder{
-		builder: generic.NewMap4[component.Body, component.CollisionGroup, component.Forces, component.Position](w, generic.T[component.CollisionGroup]()),
+		builder: generic.NewMap5[component.Body, component.CollisionGroup, component.Forces, component.Position, component.Wrap](w, generic.T[component.CollisionGroup]()),
 		rng:     rand.New(ecs.GetResource[resource.Rand](w)),
 
 		collisionGroup: collisionGroup,
@@ -46,7 +46,7 @@ func NewAsteroidBuilder(w *ecs.World, collisionGroup ecs.Entity) *AsteroidBuilde
 func (b *AsteroidBuilder) BuildBatch(count int) {
 	query := b.builder.NewBatchQ(count, b.collisionGroup)
 	for query.Next() {
-		body, _, forces, position := query.Get()
+		body, _, forces, position, _ := query.Get()
 		*body = *b.body()
 		*forces = *b.forces()
 		*position = *b.position()
