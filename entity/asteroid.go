@@ -75,6 +75,7 @@ func (b *AsteroidBuilder) body() *component.Body {
 
 func (b *AsteroidBuilder) forces() *component.Forces {
 	return &component.Forces{
+		Rotation: (b.rng.Float32() - 0.5) * math.Pi / 180,
 		Velocity: geo.Vec2{
 			X: b.velocityMin.X + b.rng.Float32()*(b.velocityMax.X-b.velocityMin.X),
 			Y: b.velocityMin.Y + b.rng.Float32()*(b.velocityMax.Y-b.velocityMin.Y),

@@ -14,6 +14,7 @@ type Cannon struct {
 }
 
 type Forces struct {
+	Rotation float32
 	Friction float32
 	Velocity geo.Vec2
 }

@@ -1,19 +1,25 @@
 package entity
 
 import (
+	"math"
+
 	"github.com/jdbann/asteroids/component"
+	"github.com/jdbann/asteroids/resource"
 	"github.com/jdbann/asteroids/util/geo"
 	"github.com/mlange-42/arche/ecs"
 	"github.com/mlange-42/arche/generic"
+	"golang.org/x/exp/rand"
 )
 
 type ExplosionBuilder struct {
 	builder generic.Map3[component.Body, component.Forces, component.Position]
+	rng     *rand.Rand
 }
 
 func NewExplosionBuilder(w *ecs.World) *ExplosionBuilder {
 	return &ExplosionBuilder{
 		builder: generic.NewMap3[component.Body, component.Forces, component.Position](w),
+		rng:     rand.New(ecs.GetResource[resource.Rand](w)),
 	}
 }
 
@@ -38,8 +44,9 @@ func (b *ExplosionBuilder) BuildFrom(entity ecs.Entity) {
 			Vertices: []geo.Vec2{start.Sub(mid), end.Sub(mid)},
 		}
 
+		forces.Rotation = (b.rng.Float32() - 0.5) * math.Pi * 2 / 180
 		forces.Velocity = sourceForces.Velocity.Add(
-			mid.Sub(sourcePosition.Coords).Normalize().Scale(0.5),
+			mid.Sub(sourcePosition.Coords).Normalize().Scale(0.75),
 		)
 
 		position.Coords = mid

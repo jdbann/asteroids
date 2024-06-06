@@ -23,6 +23,7 @@ func (s *Movement) Update(w *ecs.World) {
 	for query.Next() {
 		forces, position := query.Get()
 		position.Coords = position.Coords.Add(forces.Velocity)
+		position.Heading += forces.Rotation
 		forces.Velocity = forces.Velocity.Scale(1 - forces.Friction)
 	}
 }
