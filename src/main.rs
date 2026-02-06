@@ -14,7 +14,15 @@ fn main() -> AppExit {
         .init_resource::<WorldBounds>()
         .insert_resource(Gravity::ZERO)
         .add_systems(Startup, (spawn_camera, spawn_asteroid, spawn_player))
-        .add_systems(FixedUpdate, (move_player, apply_wrapping))
+        .add_systems(
+            FixedUpdate,
+            (
+                move_player,
+                fire_cannon,
+                apply_wrapping,
+                despawn_beyond_world_bounds,
+            ),
+        )
         .add_systems(Update, draw_world_bounds)
         .run()
 }
@@ -126,6 +134,9 @@ fn move_player(
 #[derive(Component)]
 struct ApplyWrapping;
 
+#[derive(Component)]
+struct DespawnBeyondWorldBounds;
+
 #[derive(Resource)]
 struct WorldBounds {
     half_size: Vec2,
@@ -155,10 +166,48 @@ fn apply_wrapping(bounds: Res<WorldBounds>, mut query: Query<&mut Transform, Wit
     }
 }
 
+fn despawn_beyond_world_bounds(
+    mut commands: Commands,
+    bounds: Res<WorldBounds>,
+    query: Query<(Entity, &Transform), With<DespawnBeyondWorldBounds>>,
+) {
+    let world_rect = Rect::from_center_half_size(Vec2::ZERO, bounds.half_size);
+    for (entity, transform) in query {
+        if !world_rect.contains(transform.translation.xy()) {
+            commands.entity(entity).despawn();
+        }
+    }
+}
+
 fn draw_world_bounds(mut gizmos: Gizmos, bounds: Res<WorldBounds>) {
     gizmos.rect_2d(
         Isometry2d::IDENTITY,
         bounds.half_size * 2.0,
         Color::srgb(1.0, 0.0, 0.0),
     );
+}
+
+#[derive(Component)]
+struct Bullet;
+
+fn fire_cannon(
+    input: Res<ButtonInput<KeyCode>>,
+    mut commands: Commands,
+    query: Query<(&Transform, &LinearVelocity), With<Player>>,
+) {
+    if input.just_pressed(KeyCode::Space) {
+        let (transform, linear_velocity) = query.single().unwrap();
+        commands.spawn((
+            Bullet,
+            transform.with_translation(transform.translation + transform.local_y() * 16.0),
+            RigidBody::Dynamic,
+            Collider::segment(vec2(0.0, 0.0), vec2(0.0, 5.0)),
+            MassProperties2d::new(0.1, 0.1, vec2(0.0, 2.5)).to_bundle(),
+            LinearVelocity(
+                transform.local_y().xy()
+                    * (200.0 + linear_velocity.0.dot(transform.local_y().xy())),
+            ),
+            DespawnBeyondWorldBounds,
+        ));
+    }
 }
