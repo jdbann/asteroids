@@ -11,9 +11,11 @@ fn main() -> AppExit {
             PhysicsPlugins::default(),
             PhysicsDebugPlugin,
         ))
+        .init_resource::<WorldBounds>()
         .insert_resource(Gravity::ZERO)
         .add_systems(Startup, (spawn_camera, spawn_asteroid, spawn_player))
-        .add_systems(FixedUpdate, move_player)
+        .add_systems(FixedUpdate, (move_player, apply_wrapping))
+        .add_systems(Update, draw_world_bounds)
         .run()
 }
 
@@ -42,6 +44,7 @@ fn spawn_asteroid(
         LinearVelocity(rng.random::<Vec2>() * rng.random_range(-20.0..=20.0)),
         AngularVelocity(rng.random::<f32>() * rng.random_range(-1.0..=1.0)),
         Mass(2.0),
+        ApplyWrapping,
     ));
 }
 
@@ -85,6 +88,7 @@ fn spawn_player(mut commands: Commands) {
             thrust: 2.0,
             turn: 20.0,
         },
+        ApplyWrapping,
     ));
 }
 
@@ -117,4 +121,44 @@ fn move_player(
             forces.apply_angular_impulse(-1.0 * ship_impulses.turn);
         }
     }
+}
+
+#[derive(Component)]
+struct ApplyWrapping;
+
+#[derive(Resource)]
+struct WorldBounds {
+    half_size: Vec2,
+}
+
+impl Default for WorldBounds {
+    fn default() -> Self {
+        Self {
+            half_size: vec2(400.0, 300.0),
+        }
+    }
+}
+
+fn apply_wrapping(bounds: Res<WorldBounds>, mut query: Query<&mut Transform, With<ApplyWrapping>>) {
+    for mut transform in &mut query {
+        if transform.translation.x <= -bounds.half_size.x {
+            transform.translation.x += bounds.half_size.x * 2.0;
+        } else if transform.translation.x >= bounds.half_size.x {
+            transform.translation -= bounds.half_size.x * 2.0;
+        }
+
+        if transform.translation.y <= -bounds.half_size.y {
+            transform.translation.y += bounds.half_size.y * 2.0;
+        } else if transform.translation.y >= bounds.half_size.y {
+            transform.translation.y -= bounds.half_size.y * 2.0;
+        }
+    }
+}
+
+fn draw_world_bounds(mut gizmos: Gizmos, bounds: Res<WorldBounds>) {
+    gizmos.rect_2d(
+        Isometry2d::IDENTITY,
+        bounds.half_size * 2.0,
+        Color::srgb(1.0, 0.0, 0.0),
+    );
 }
