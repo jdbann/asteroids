@@ -3,14 +3,23 @@ use bevy::prelude::*;
 use bevy_rand::prelude::*;
 use rand::Rng;
 
+const GRAPPLING_HOOK_RANGE: f32 = 300.0;
+
 fn main() -> AppExit {
     App::new()
         .add_plugins((
             DefaultPlugins,
-            EntropyPlugin::<bevy_prng::WyRand>::with_seed(0_u64.to_ne_bytes()),
+            EntropyPlugin::<bevy_prng::WyRand>::new(),
             PhysicsPlugins::default(),
             PhysicsDebugPlugin,
         ))
+        .insert_gizmo_config(
+            PhysicsGizmos {
+                shapecast_color: Some(Color::srgba(1.0, 0.0, 0.0, 0.2)),
+                ..default()
+            },
+            GizmoConfig::default(),
+        )
         .init_resource::<WorldBounds>()
         .insert_resource(Gravity::ZERO)
         .add_systems(Startup, (spawn_camera, spawn_asteroid, spawn_player))
@@ -19,6 +28,7 @@ fn main() -> AppExit {
             (
                 move_player,
                 fire_cannon,
+                fire_grappling_hook,
                 apply_wrapping,
                 despawn_beyond_world_bounds,
             ),
@@ -97,6 +107,9 @@ fn spawn_player(mut commands: Commands) {
             turn: 20.0,
         },
         ApplyWrapping,
+        ShapeCaster::new(Collider::circle(5.0), vec2(0.0, 20.0), 0.0, Dir2::NORTH)
+            .with_max_hits(1)
+            .with_max_distance(GRAPPLING_HOOK_RANGE),
     ));
 }
 
@@ -145,7 +158,7 @@ struct WorldBounds {
 impl Default for WorldBounds {
     fn default() -> Self {
         Self {
-            half_size: vec2(400.0, 300.0),
+            half_size: vec2(400.0, 300.0) * 3.0,
         }
     }
 }
@@ -209,5 +222,35 @@ fn fire_cannon(
             ),
             DespawnBeyondWorldBounds,
         ));
+    }
+}
+
+fn fire_grappling_hook(
+    input: Res<ButtonInput<KeyCode>>,
+    mut commands: Commands,
+    query: Query<(Entity, &ShapeHits)>,
+    transform_query: Query<&GlobalTransform>,
+) {
+    if input.just_pressed(KeyCode::KeyG) {
+        let (entity, shape_hits) = query.single().unwrap();
+
+        let Some(hit) = shape_hits.first() else {
+            return;
+        };
+
+        let hit_transform = transform_query.get(hit.entity).unwrap();
+
+        commands.spawn(
+            DistanceJoint::new(entity, hit.entity)
+                .with_local_anchor1(vec2(0.0, -5.0))
+                .with_local_anchor2(
+                    hit_transform
+                        .affine()
+                        .inverse()
+                        .transform_point3(hit.point1.extend(0.0))
+                        .xy(),
+                )
+                .with_limits(5.0, GRAPPLING_HOOK_RANGE + 30.0),
+        );
     }
 }
