@@ -1,0 +1,6 @@
+[tools]
+rust = "1.92"
+"cargo:https://github.com/TheBevyFlock/bevy_cli" = { version = "tag:cli-v0.1.0-alpha.2", crate = "bevy_cli" }
+
+[tasks]
+web = { run = "bevy run web --open" }
